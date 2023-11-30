@@ -1,5 +1,15 @@
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
+import pygwalker as pyg
+from pygwalker.api.streamlit import init_streamlit_comm, get_streamlit_html
+
+
+
+st.set_page_config(
+    page_title="Breast Cancer Dashboard",
+    layout="wide"
+)
 
 file_id = '1b2Ztm96gkVadOftMmlUXowbQtzGL8Vqp'
 
@@ -43,9 +53,25 @@ def tasks():
     taskData = pd.DataFrame(list(zip(group4Tasks, group4Members)), columns =['Task', 'Member'])
     st.dataframe(taskData, use_container_width = True)
 
+def dashboard():
+    init_streamlit_comm()
+    @st.cache_resource
+    def get_pyg_html(df: pd.DataFrame) -> str:
+        html = get_streamlit_html(df, spec="./gw0.json", use_kernel_calc=True, debug=False)
+        return html
+    @st.cache_data
+    def get_df() -> pd.DataFrame:
+        return data
+    
+    df = get_df()
+
+    components.html(get_pyg_html(df), width=1300, height=1000, scrolling=True)
+
+
 page_names_to_funcs = {
     "About": about,
-    "Tasks": tasks
+    "Tasks": tasks,
+    "Dashboard" : dashboard
 }
 
 demo_name = st.sidebar.selectbox("Choose a page", page_names_to_funcs.keys())
