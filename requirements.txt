@@ -1,3 +1,4 @@
 pandas
 pygwalker
 streamlit
+altair
